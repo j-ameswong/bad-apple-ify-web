@@ -1,0 +1,10 @@
+node_modules/
+dist/
+.sites-runtime/
+test-results/
+playwright-report/
+tests/fixtures/*.webm
+tests/fixtures/*.mkv
+tests/fixtures/*.mp4
+*.zip
+*.log
