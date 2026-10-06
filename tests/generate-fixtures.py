@@ -35,6 +35,12 @@ def main() -> None:
     video(directory / "long-source.webm", seconds=6, audio=True)
     video(directory / "gallery.webm", seconds=2, audio=False)
     ffmpeg(
+        "-f", "lavfi", "-i", "testsrc2=size=320x240:rate=30000/1001:duration=1",
+        "-c:v", "libvpx-vp9", "-deadline", "good", "-cpu-used", "5",
+        "-b:v", "0", "-crf", "36", "-pix_fmt", "yuv420p", "-threads", "2",
+        str(directory / "fractional-fps.webm"),
+    )
+    ffmpeg(
         "-f", "lavfi", "-i", "testsrc2=size=64x32:rate=1:duration=1",
         "-frames:v", "1", str(directory / "gallery-wide.png"),
     )

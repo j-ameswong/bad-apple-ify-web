@@ -182,6 +182,29 @@ test('brightness matching produces an encoded mosaic', async ({ page }) => {
   expect(probe(mosaic)).toMatchObject({ width: 32, height: 24, frames: 8 });
 });
 
+test('encodes a high-bitrate output from a fractional-fps source', async ({ page }) => {
+  await page.goto('/');
+  await selectFiles(page, 'fractional-fps.webm');
+  await setSetting(page, 'grid', '4x3');
+  await setSetting(page, 'cell_size', '128');
+  await setSetting(page, 'tile_fit', 'crop');
+  await setSetting(page, 'metric', 'colour');
+  await setSetting(page, 'contrast', '1');
+  await setSetting(page, 'stride', '1');
+  await setSetting(page, 'segment', '8');
+  await setSetting(page, 'duration', '0.1');
+  await page.locator('#estimate').click();
+  await expect(page.locator('#run')).toBeEnabled();
+  await page.locator('#run').click();
+  await expect(page.locator('#status')).toContainText(/Finished|bitrate.*positive integer/i, { timeout: 10_000 });
+  await expect(page.locator('#status')).toContainText('Finished', { timeout: 1_000 });
+
+  const mosaic = await saveDownload(page, '#mosaic-download', 'fractional-fps-mosaic');
+  const combined = await saveDownload(page, '#combined-download', 'fractional-fps-combined');
+  expect(probe(mosaic)).toMatchObject({ width: 512, height: 384, frames: 3 });
+  expect(probe(combined)).toMatchObject({ width: 1024, height: 384, frames: 3 });
+});
+
 test('native gallery aspect resolves explicit grid before validating output size', async ({ page }) => {
   await page.goto('/');
   await page.locator('#source').setInputFiles(join(fixtureDir, 'source.webm'));

@@ -225,7 +225,8 @@ class CanvasEncoder {
     const target = new StreamTarget(writable, { chunked: true, chunkSize: 4 * 1024 * 1024 });
     const outputFormat = format === 'mp4' ? new Mp4OutputFormat() : new WebMOutputFormat();
     const output = new Output({ format: outputFormat, target });
-    const source = new CanvasSource(canvas, { codec: format === 'mp4' ? 'avc' : 'vp9', bitrate: Math.max(400_000, canvas.width * canvas.height * fps * 0.12), keyFrameInterval: 1 });
+    const bitrate = Math.ceil(Math.max(400_000, canvas.width * canvas.height * fps * 0.12));
+    const source = new CanvasSource(canvas, { codec: format === 'mp4' ? 'avc' : 'vp9', bitrate, keyFrameInterval: 1 });
     output.addVideoTrack(source, { frameRate: fps });
     try { await output.start(); }
     catch (error) { await output.cancel().catch(() => undefined); throw error; }
